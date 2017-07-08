@@ -1,0 +1,20 @@
+{
+  "name": "neoman-plugin-json",
+  "version": "1.0.0",
+  "description": "A plugin for parsing XML in Neoman templates.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm-run-all tsc jison",
+    "jison": "jison json.jison json.jisonlex -o dist/json.js",
+    "tsc": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chris Dibbern <chris.dibbern@gmail.com> (https://github.com/cdibbs)",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^8.0.9",
+    "copyfiles": "^1.2.0",
+    "jison": "^0.4.17",
+    "npm-run-all": "^4.0.2"
+  }
+}
