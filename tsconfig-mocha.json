@@ -18,8 +18,8 @@
 			"src/lib/types"
 		],
 		"types": [
-			"@types/node",
-			"@types/mocha",
+			"node",
+			"mocha",
 			"requireg"
 		]
 	},

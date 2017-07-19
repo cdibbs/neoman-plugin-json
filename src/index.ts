@@ -2,7 +2,7 @@ import * as json from './parsers/json';
 import * as jsonPath from './parsers/json-path';
 import { TraversalResult } from './traversal-result';
 
-class XmlPlugin {
+class JSONPlugin {
     pluginConfiguration: any;
 
     configure(pluginConfiguration: any) {
@@ -30,7 +30,8 @@ class XmlPlugin {
             return val($r, path, content, replace, params);
         }
     */
-    let traverser = this.traverse(subject);
+    let obj = json.parse(content);
+    let result = this.traverse(obj, subject);
 
         try {
         console.log("JSON!", JSON.stringify(json.parse(content), null, 4));
@@ -40,11 +41,22 @@ class XmlPlugin {
         }
     }
 
-    traverse(subject: string): TraversalResult {
-        let ast = jsonPath.parse(subject);
-        console.log(ast);
-        return new TraversalResult();
+    traverse(json: any, subject: string): TraversalResult {
+      let tr = new TraversalResult();
+      tr.subject = subject;
+      tr.parent = null;
+      tr.result = json;
+      let ast = jsonPath.parse(subject);
+      let path = ast[1];
+      for (var i=0; i<path.length; i++) {
+        let key = path[i][1];
+        if (tr.result.hasOwnProperty(key)) {
+          tr.parent = tr.result;
+          tr.result = tr.result[key];
+        }
+      }
+      return tr;
     }
 }
 
-export = XmlPlugin;
+export = JSONPlugin;
