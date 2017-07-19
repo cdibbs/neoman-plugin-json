@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-    "baseUrl": "./",
+        "baseUrl": "./",
 		"experimentalDecorators": true,
 		"lib": ["es6", "dom"],
 		"module": "commonjs",
@@ -9,21 +9,26 @@
 		"suppressImplicitAnyIndexErrors": true,
 		"moduleResolution": "node",
 		"emitDecoratorMetadata": true,
-		"sourceMap": false,
+		"sourceMap": true,
 		"declaration": true,
-		"outDir": "dist",
+		"outDir": "test",
 		"removeComments": false,
 		"typeRoots": [
-			"node_modules/@types"
+			"node_modules/@types",
+			"src/lib/types"
 		],
 		"types": [
-			"@types/node"
+			"@types/node",
+			"@types/mocha",
+			"requireg"
 		]
 	},
-	"files": [
-		"src/index.ts"
+	"include": [
+		"src/*.spec.ts"
 	],
 	"exclude": [
+		"test",
+    "dist",
 		"node_modules"
 	]
 }

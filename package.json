@@ -4,17 +4,31 @@
   "description": "A plugin for parsing XML in Neoman templates.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm-run-all tsc jison",
-    "jison": "jison json.jison json.jisonlex -o dist/json.js",
+    "build": "npm-run-all tsc json_jison jsonPath_jison copystatic",
+    "json_jison": "jison src/parsers/json.jison src/parsers/json.jisonlex -o src/parsers/json.js",
+    "jsonPath_jison": "jison src/parsers/json-path.jison src/parsers/json-path.jisonlex -o src/parsers/json-path.js",
     "tsc": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "npm-run-all json_jison jsonPath_jison",
+    "test": "cross-env TS_NODE_COMPILER_OPTIONS={\\\"module\\\":\\\"commonjs\\\",\\\"project\\\":\\\"tsconfig-mocha.json\\\"} mocha --recursive --compilers ts:ts-node/register --compilerOptions --bail src/*.spec.ts src/**/*.spec.ts",
+    "cover": "nyc npm test",
+    "report_coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "copystatic": "copyfiles -u 2 src/parsers/*.js dist/"
   },
   "author": "Chris Dibbern <chris.dibbern@gmail.com> (https://github.com/cdibbs)",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.0.1",
+    "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.9",
+    "@types/sinon": "^2.3.3",
+    "chai": "^4.1.0",
     "copyfiles": "^1.2.0",
+    "cross-env": "^5.0.1",
     "jison": "^0.4.17",
-    "npm-run-all": "^4.0.2"
+    "mocha": "^3.4.2",
+    "npm-run-all": "^4.0.2",
+    "sinon": "^2.3.8",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1"
   }
 }
