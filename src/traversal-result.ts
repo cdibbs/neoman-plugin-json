@@ -15,4 +15,5 @@ export interface JisonMetaData {
     last_line: number;
     first_column: number;
     last_column: number;
+    range: [number, number];
 }

@@ -5,6 +5,7 @@ import 'mocha';
 import * as chai from 'chai';
 let expect = chai.expect, assert = chai.assert;
 import * as sinon from 'sinon';
+import { ParamsModel } from './types';
 
 let JSONPlugin = require('./index');
 let JSONParser = require('./parsers/json');
@@ -61,26 +62,29 @@ describe('JSONPlugin', () => {
     it('should replace the string component with a string at the right location', () => {
       let content = "chris was here";
       let subject = "";
-      let travResult = { destination: { meta: { first_column: 6, last_column: 9 } } };
-      let result = p["applyTransform"](content, subject, travResult, "is");
-      expect(result).to.equal("chris is here");
+      let travResult = { destination: { meta: { range: [6, 9] } } };
+      let params = new ParamsModel();
+      let result = p["applyTransform"](content, subject, travResult, "is", params);
+      expect(result).to.equal("chris \"is\" here");
     });
     it('should replace the string component with a function result at the right location', () => {
       let content = "chris was here";
       let subject = "";
-      let travResult = { destination: { meta: { first_column: 6, last_column: 9 } } };
+      let travResult = { destination: { meta: { range: [6, 9] } } };
       let fn = () => "will be";
-      let result = p["applyTransform"](content, subject, travResult, fn);
-      expect(result).to.equal("chris will be here");
+      let params = new ParamsModel();
+      let result = p["applyTransform"](content, subject, travResult, fn, params);
+      expect(result).to.equal("chris \"will be\" here");
     });
     it('should call the replace function with the needed parameters', () => {
       let content = "chris was here";
       let subject = "";
-      let travResult = { destination: { meta: { first_column: 6, last_column: 9 } } };
+      let travResult = { destination: { meta: { range: [6, 9] } } };
       let fn = sinon.stub();
       fn.returns("would be");
-      let result = p["applyTransform"](content, subject, travResult, fn);
-      expect(result).to.equal("chris would be here");
+      let params = new ParamsModel();
+      let result = p["applyTransform"](content, subject, travResult, fn, params);
+      expect(result).to.equal("chris \"would be\" here");
       sinon.assert.calledWith(fn, subject, travResult);
     });
     it('should use params.type when deciding how to insert', () => {

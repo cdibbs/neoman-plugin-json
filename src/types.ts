@@ -3,14 +3,14 @@ export type UnionKeyToValue<U extends string> = {
 };
 
 export class ParamsModel {
-    op: Operation = Operations.setValue;
+    action: Operation = Operations.set;
     type: TransformAsType = TransformAsTypes.useSource;
     ignoreInvalid: boolean = false;
 }
 
-export type Operation = "setValue" | "setKey" | "append" | "prepend" | "insertAfter" | "insertBefore";
+export type Operation = "set" | "setKey" | "append" | "prepend" | "insertAfter" | "insertBefore";
 export let Operations: UnionKeyToValue<Operation> = {
-    "setValue": "setValue",
+    "set": "set",
     "setKey": "setKey",
     "append": "append",
     "prepend": "prepend",

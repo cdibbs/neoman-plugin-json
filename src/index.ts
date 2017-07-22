@@ -1,6 +1,7 @@
 import * as json from './parsers/json';
 import * as jsonPath from './parsers/json-path';
 import { TraversalResult, JSONPointer } from './traversal-result';
+import { ParamsModel, TransformAsTypes, Operations } from './types';
 
 class JSONPlugin {
     pluginConfiguration: any;
@@ -38,18 +39,45 @@ class JSONPlugin {
             throw new Error("Not valid JSON: " + (err && err.message) || err);
         }
 
+        let paramsWithDefaults = Object.assign(new ParamsModel(), params);
         let travResult = this.traverse(obj, subject);
-        let trans = this.applyTransform(content, subject, travResult, valOrFn);
+        let trans = this.applyTransform(content, subject, travResult, valOrFn, paramsWithDefaults);
         return trans;
     }
 
-    protected applyTransform(content: string, subject: string, travResult: TraversalResult, valOrFn: string | Function): string {
+    protected applyTransform(content: string, subject: string, travResult: TraversalResult, valOrFn: string | Function, params: ParamsModel): string {
         let r = valOrFn;
         if (typeof valOrFn === "function") {
             r = valOrFn(subject, travResult);
         }
 
-        return content.substr(0, travResult.destination.meta.first_column) + r + content.substr(travResult.destination.meta.last_column);
+        if (params.type === TransformAsTypes.useSource) {
+            switch (typeof r) {
+                case "string":
+                    r = this.makeStringString(<string>r);
+                    break;
+                case "number":
+                    break;
+            }
+        } else if (params.type === "string") {
+            r = this.makeStringString(<string>r);
+        } else if (params.type === "number") {
+            r = this.makeNumberString(r);
+        }
+
+        let meta = travResult.destination.meta;
+        let startIndex = meta.range[0];
+        let endIndex = meta.range[1];
+
+        return content.substr(0, startIndex) + r + content.substr(endIndex);
+    }
+
+    protected makeStringString(r: string): string {
+        return "\"" + r.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    }
+    
+    protected makeNumberString(r: any): string {
+        return "" + r;
     }
 
     protected traverse(json: any, subject: string): TraversalResult {

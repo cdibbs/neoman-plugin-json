@@ -138,8 +138,15 @@ describe("full replacements", () => {
   it('should perform basic replace', () => {
     let content = "{ \"one\": \"two\", \"three\": [ \"four\", { \"five\" : 6 } ] }";
     let subject = "$.three[1].five";
-    let result = p.transform("/tmp/path", content, subject, "7");
+    let result = p.transform("/tmp/path", content, subject, "7", { type: "number" });
     expect(result).to.equal("{ \"one\": \"two\", \"three\": [ \"four\", { \"five\" : 7 } ] }");
+  });
+
+  it('should operate regardless of new line characters', () => {
+    let content = "{\n  \"name\"\: \"htmlproj\"\n}";
+    let subject = "$.name";
+    let result = p.transform("/tmp/path", content, subject, "test2", { type: "string" });
+    expect(result).to.equal("{\n  \"name\"\: \"test2\"\n}");
   });
 
   it('should error on bad subject', () => {
