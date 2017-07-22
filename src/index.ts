@@ -65,11 +65,23 @@ class JSONPlugin {
             r = this.makeNumberString(r);
         }
 
-        let meta = travResult.destination.meta;
-        let startIndex = meta.range[0];
-        let endIndex = meta.range[1];
-        //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
-        return content.substr(0, startIndex) + r + content.substr(endIndex);
+        if (params.action === Operations.set) {
+            let meta = travResult.destination.meta;
+            let startIndex = meta.range[0];
+            let endIndex = meta.range[1];
+            //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
+            return content.substr(0, startIndex) + r + content.substr(endIndex);
+        } else if (params.action === Operations.setKey) {
+            if (travResult.destinationKey == null) {
+                throw new Error(`Cannot set key. Destination "${travResult.subject}" is not a keyed object.`);
+            }
+
+            let meta = travResult.destinationKey.meta;
+            let startIndex = meta.range[0];
+            let endIndex = meta.range[1];
+            //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
+            return content.substr(0, startIndex) + r + content.substr(endIndex);
+        }
     }
 
     protected makeStringString(r: string): string {
@@ -107,6 +119,7 @@ class JSONPlugin {
             newTr.subject = this.buildComponentStr(path, i);
             newTr.parent = tr;
             newTr.destination = tr.destination.v[key];
+            newTr.destinationKey = null;
             return newTr;
         } else {
             throw new Error(`Element "${key}" at subpath "${this.buildComponentStr(path, i)}" does not exist.`);
@@ -121,6 +134,7 @@ class JSONPlugin {
                 let newTr = new TraversalResult();
                 newTr.subject = this.buildComponentStr(path, i);
                 newTr.destination = tn.v[1];
+                newTr.destinationKey = tn.v[0];
                 newTr.parent = tr;
                 found = true;
                 return newTr;

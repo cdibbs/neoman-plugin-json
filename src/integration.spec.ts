@@ -166,6 +166,22 @@ describe("full replacements", () => {
       .and.property('message').to.contain("not an array or object").and.to.contain("\"$[\"three\"][0]\"");
   });
 
+  it('should set key when keyed object', () => {
+    let content = "{ \"one\": \"two\", \"three\": [ \"four\", { \"five\" : 6 } ] }";
+    let subject = "$.three[1].five";
+    let result = p.transform("/tmp/path", content, subject, "7", { type: "string", action: "setKey" });
+    expect(result).to.equal("{ \"one\": \"two\", \"three\": [ \"four\", { \"7\" : 6 } ] }");
+  });
+
+  it('should error setting key when not a keyed object', () => {
+    expect(() => {
+      let content = "{ \"one\": \"two\", \"three\": [ \"four\", \"five\" ] }";
+      let subject = "$.three[1]";
+      let result = p.transform("/tmp/path", content, subject, "7", { type: "string", action: "setKey" });
+      expect(result).to.equal("{ \"one\": \"two\", \"three\": [ \"four\", { \"7\" : 6 } ] }");
+    }).to.throw().and.property('message').to.contain('Cannot set key').and.to.contain('"$["three"]');
+  });
+
   it('should error on invalid resulting JSON, if not overridden', () => {
 
   });
