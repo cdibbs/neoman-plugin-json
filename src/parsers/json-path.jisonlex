@@ -7,7 +7,7 @@ int     "-"?(?:[0-9]|[1-9][0-9]+)
 %%
 
 \s+                        /* skip whitespace */
-{int}                      return 'NUMBER';
+{int}\b                    return 'NUMBER';
 "\""(?:\\[\"bfnrt/\\]|\\u[a-fA-F0-9]{4}|[^\"\\])*"\""      { yytext = yytext.substr(1,yyleng-2); return 'STRING'; }
 '$'                        return '$';
 [_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]* return 'ID';

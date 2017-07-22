@@ -10,7 +10,7 @@ frac    (?:\.[0-9]+)
 %%
 
 \s+                        /* skip whitespace */
-{int}{frac}?{exp}?       return 'NUMBER';
+{int}{frac}?{exp}?\b       return 'NUMBER';
 "\""(?:\\[\"bfnrt/\\]|\\u[a-fA-F0-9]{4}|[^\"\\])*"\""      { yytext = yytext.substr(1,yyleng-2); return 'STRING'; }
 \{                         return '{';
 \}                         return '}';

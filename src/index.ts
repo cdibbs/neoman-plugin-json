@@ -68,7 +68,7 @@ class JSONPlugin {
         let meta = travResult.destination.meta;
         let startIndex = meta.range[0];
         let endIndex = meta.range[1];
-
+        //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
         return content.substr(0, startIndex) + r + content.substr(endIndex);
     }
 
@@ -90,22 +90,46 @@ class JSONPlugin {
       for (var i=0; i<path.length; i++) {
         let key = path[i][1];
         if (tr.destination.type === "object") {
-            for(var j=0; j<(<[JSONPointer]>tr.destination.v).length; j++) {
-                let tn = tr.destination.v[j]
-                if (tn.type === "member" && tn.v[0].v === key) {
-                    tr.parent = tr.destination;
-                    tr.destination = tn.v[1];
-                }
-            }
+            tr = this.traverseObject(tr, key, path, i);
         } else if (tr.destination.type === "array") {
-            tr.parent = tr.destination;
-            tr.destination = tr.destination.v[key];
+            tr = this.traverseArray(tr, key, path, i);
         } else {
-            let err = `Element at subpath ${this.buildComponentStr(path, i)} (while traversing to ${key}) is not an array or object, but a ${tr.destination.type}.\n`;
+            let err = `Element at subpath "${this.buildComponentStr(path, i)}" is not an array or object, but a "${tr.destination.type}".\n`;
             throw new Error(err);
         }
       }
       return tr;
+    }
+
+    protected traverseArray(tr: TraversalResult, key: any, path: string[], i: number): TraversalResult {
+        if (key >= 0 && key < (<Array<JSONPointer>>tr.destination.v).length) {
+            let newTr = new TraversalResult();
+            newTr.subject = this.buildComponentStr(path, i);
+            newTr.parent = tr;
+            newTr.destination = tr.destination.v[key];
+            return newTr;
+        } else {
+            throw new Error(`Element "${key}" at subpath "${this.buildComponentStr(path, i)}" does not exist.`);
+        }
+    }
+
+    protected traverseObject(tr: TraversalResult, key: any, path: string[], i: number): TraversalResult {
+        let found = false;
+        for(var j=0; j<(<[JSONPointer]>tr.destination.v).length; j++) {
+            let tn = tr.destination.v[j]
+            if (tn.type === "member" && tn.v[0].v === key) {
+                let newTr = new TraversalResult();
+                newTr.subject = this.buildComponentStr(path, i);
+                newTr.destination = tn.v[1];
+                newTr.parent = tr;
+                found = true;
+                return newTr;
+            }
+        }
+        
+        if (! found) {
+            throw new Error(`Element "${key}" at subpath "${this.buildComponentStr(path, i)}" does not exist.`);
+        }
     }
 
     protected buildComponentStr(path: any, upTo: number) {

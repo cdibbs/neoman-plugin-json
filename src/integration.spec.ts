@@ -142,6 +142,13 @@ describe("full replacements", () => {
     expect(result).to.equal("{ \"one\": \"two\", \"three\": [ \"four\", { \"five\" : 7 } ] }");
   });
 
+  it('should perform a replace within an array', () => {
+    let content = "{ \"one\": [123, 345, 456] }";
+    let subject = "$.one[2]";
+    let result = p.transform("/tmp/path", content, subject, "7", { type: "number" });
+    expect(result).to.equal("{ \"one\": [123, 345, 7] }");
+  });
+
   it('should operate regardless of new line characters', () => {
     let content = "{\n  \"name\"\: \"htmlproj\"\n}";
     let subject = "$.name";
@@ -156,7 +163,7 @@ describe("full replacements", () => {
       let result = p.transform("/tmp/path", content, subject, "7");
       expect(result).to.equal("{ \"one\": \"two\", \"three\": [ \"four\", { \"five\" : 7 } ] }");
     }).to.throw()
-      .and.property('message').to.contain("not an array or object").and.to.contain("$[\"three\"][0] ");
+      .and.property('message').to.contain("not an array or object").and.to.contain("\"$[\"three\"][0]\"");
   });
 
   it('should error on invalid resulting JSON, if not overridden', () => {

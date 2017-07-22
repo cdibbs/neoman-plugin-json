@@ -1,7 +1,7 @@
 export class TraversalResult {
     subject: string;
     destination: JSONPointer;
-    parent: JSONPointer;
+    parent: TraversalResult;
 }
 
 export class JSONPointer {

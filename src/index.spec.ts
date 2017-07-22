@@ -25,7 +25,7 @@ describe('JSONPlugin', () => {
       expect(tr.destination).to.exist;
       expect(tr.destination.type).to.equal("string");
       expect(tr.parent).to.exist;
-      expect(tr.parent.type).to.equal("array");
+      expect(tr.parent.destination.type).to.equal("array");
       expect(tr.destination.meta.first_column).to.equal(19);
       expect(tr.destination.meta.last_column).to.equal(24);
     });
@@ -37,7 +37,7 @@ describe('JSONPlugin', () => {
       expect(tr.destination).to.exist;
       expect(tr.destination.type).to.equal("object");
       expect(tr.parent).to.exist;
-      expect(tr.parent.type).to.equal("array");
+      expect(tr.parent.destination.type).to.equal("array");
       tr = p["traverse"](pobj, "$.chris[1].two[1]");
       expect(tr).to.exist;
       expect(tr.destination).to.exist;
@@ -45,11 +45,16 @@ describe('JSONPlugin', () => {
       expect(tr.destination.orig).to.equal(3.141);
       expect(tr.destination.v).to.equal("3.141");
       expect(tr.parent).to.exist;
-      expect(tr.parent.type).to.equal("array");      
+      expect(tr.parent.destination.type).to.equal("array");      
       expect(tr.destination.meta.first_column).to.equal(47);
       expect(tr.destination.meta.last_column).to.equal(52);
     });
     it('should throw when traversing non-existant path', () => {
+      assert.throws(() => {
+        let sobj = '{ "chris": "something" }';
+        let pobj = JSONParser.parse(sobj);
+        let tr = p["traverse"](pobj, "$.john[1]");
+      });
       assert.throws(() => {
         let sobj = '{ "chris": ["one", "two", "three"] }';
         let pobj = JSONParser.parse(sobj);
