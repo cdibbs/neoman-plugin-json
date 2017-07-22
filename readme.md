@@ -13,7 +13,7 @@ JSON files without modifying original whitespace and formatting.
 
 ## Basic Usage
 
-Within your `.neoman.config/template.json` file, add it to your `configuration` and `transform` sections:
+Within your `.neoman.config/template.json` file, add something like the following to your `configuration` and `transform` sections:
 
 ```json
 "#": "The following presumes variables configured in the inputConfig section.",
