@@ -8,14 +8,15 @@ export class ParamsModel {
     ignoreInvalid: boolean = false;
 }
 
-export type Operation = "set" | "setKey" | "append" | "prepend" | "insertAfter" | "insertBefore";
+export type Operation = "set" | "setKey" | "append" | "prepend" | "insertAfter" | "insertBefore" | "remove";
 export let Operations: UnionKeyToValue<Operation> = {
     "set": "set",
     "setKey": "setKey",
     "append": "append",
     "prepend": "prepend",
     "insertAfter": "insertAfter",
-    "insertBefore": "insertBefore"
+    "insertBefore": "insertBefore",
+    "remove": "remove"
 };
 
 export type TransformAsType = "useDestination" | "useSource" | "string" | "boolean" | "number" | "object" | "array" | "null";
