@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/cdibbs/neoman-plugin-json.svg?branch=master)](https://travis-ci.org/cdibbs/neoman)
-[![dependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/status.svg)](https://david-dm.org/cdibbs/neoman)
-[![devDependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/dev-status.svg)](https://david-dm.org/cdibbs/neoman?type=dev)
+[![Build Status](https://travis-ci.org/cdibbs/neoman-plugin-json.svg?branch=master)](https://travis-ci.org/cdibbs/neoman-plugin-json)
+[![dependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json)
+[![devDependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/dev-status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json?type=dev)
 
 [![MIT License][license-badge]][LICENSE]
 [![PRs Welcome][prs-badge]][prs]
@@ -8,7 +8,7 @@
 
 # Neoman JSON Plugin
 
-This is the official JSON transform plugin for the [Neoman]() templating engine. Use it to transform
+This is the official JSON transform plugin for the [Neoman](https://github.com/cdibbs/neoman) templating engine. Use it to transform
 JSON files without modifying original whitespace and formatting.
 
 ## Basic Usage
