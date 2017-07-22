@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/cdibbs/neoman-plugin-json.svg?branch=master)](https://travis-ci.org/cdibbs/neoman-plugin-json)
 [![dependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json)
 [![devDependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/dev-status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json?type=dev)
+[![codecov](https://codecov.io/gh/cdibbs/neoman-plugin-json/branch/master/graph/badge.svg)](https://codecov.io/gh/cdibbs/neoman-plugin-json)
 
 [![MIT License][license-badge]][LICENSE]
 [![PRs Welcome][prs-badge]][prs]
