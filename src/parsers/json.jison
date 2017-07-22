@@ -63,7 +63,7 @@ JSONMemberList: JSONMember
 JSONArray: "[" "]"
   { $$ = { "type": "array", "orig": [], "v": [], "meta": @$ }; }
   | "[" JSONElementList "]"
-  { $$ = { "type": "array", "orig": $2.orig, "v": $2, "meta": @$ }; }
+  { $$ = { "type": "array", "orig": $2.map(e => e.orig), "v": $2, "meta": @$ }; }
   ;
 
 JSONElementList: JSONValue
