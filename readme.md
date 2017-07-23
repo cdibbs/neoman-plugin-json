@@ -14,31 +14,35 @@ JSON files without modifying original whitespace and formatting.
 
 ## Basic Usage
 
-Within your `.neoman.config/template.json` file, add something like the following to your `configuration` and `transform` sections:
+Within your `.neoman.config/template.json` file, add something like the following to your `configurations` and `transform` sections:
 
 ```json
 "#": "The following presumes variables configured in the inputConfig section.",
 "transform": [
-    { "subject": "$.name", "with": "{{userEnteredName}}", "configuration": "projectJson" },
-    { "subject": "$.scripts.test", "with": "", "configuration": "projectJson", "params": { "action": "remove" } },
-    { "subject": "$.tags", "with": "{{userTags}}", "configuration": "projectJson", "params": { "action": "append" } },
-    { "subject": "$._publicDescr", "with": "description", "configuration": "projectJson", "params": { "action": "setKey" }},
-    { "subject": "$.someValue", "with": "3.14", "configuration": "projectJson", "params": { "action": "set", "type": "number" } }
+    { "subject": "$.name", "with": "{{userEnteredName}}", "using": "json" },
+    { "subject": "$.scripts.test", "using": "json", "params": { "action": "remove" } },
+    { "subject": "$.tags", "with": "{{userTags}}", "using": "json", "params": { "action": "append" } },
+    { "subject": "$._publicDescr", "with": "description", "using": "json", "params": { "action": "setKey" }},
+    { "subject": "$.someValue", "with": "3.14", "using": "json", "params": { "action": "set", "type": "number" } }
 ]
 "configurations": {
-    "projectJson": {
+    "json": {
         "files": ["package.json"],
         "plugin": "json"
     }
 }
 ```
 
+## Fields
+
 The `subject` field uses the subset of JSONPath that identifies a single destination element. JSONPath semantics which
 allow you to specify more than one destination element are not currently supported.
 
 The `with` field follows the same behavior as the rest of Neoman.
 
-The `configuration` field refers to an entry in the `configurations` section which configures an instance of this plugin.
+The `using` field refers to an entry in the `configurations` section which configures an instance of this plugin.
+
+The `params` field in Neoman can have anything in it. This plugin defines several such subfields. See [Params](#Params).
 
 ## Params
 
