@@ -68,6 +68,10 @@ JSONArray: "[" "]"
 
 JSONElementList: JSONValue
   { $$ = [$1]; }
-  | JSONElementList "," JSONValue
-  { $$ = $1; $1.push($3); }
+  | JSONElementList JSONSep JSONValue
+  { $$ = $1; $3.meta.leftSep = $JSONSep; $1[$1.length - 1].meta.rightEl = $3.meta; $1.push($JSONValue); }
+  ;
+
+JSONSep: ","
+  { $$ = @$; }
   ;

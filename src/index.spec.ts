@@ -61,9 +61,31 @@ describe('JSONPlugin', () => {
         let tr = p["traverse"](pobj, "$.chris[1].john");
       });
     });
+    it('should set subject according to depth', () => {
+      let sobj = '{ "nonsense": 1, "chris": ["one", { "two": [1, 3.141] }, "three"] }';
+      let pobj = JSONParser.parse(sobj);
+
+      let tr = p["traverse"](pobj, "$.chris[1]");
+
+      expect(tr.subject).to.equal('$["chris"][1]');
+      expect(tr.parent.subject).to.equal('$["chris"]');
+      expect(tr.parent.parent.subject).to.equal("$");
+    });
   });
 
   describe('#applyTransform', () => {
+    it('should get transform value', () => {
+      let stub = sinon.stub();
+      p["getTransformValue"] = stub;
+      let content = "chris was here";
+      let subject = "";
+      let travResult = { destination: { meta: { range: [6, 9] } } };
+      let params = new ParamsModel();
+
+      p["applyTransform"](content, subject, travResult, "", params);
+
+      sinon.assert.calledWith(stub, "", subject, travResult, params);
+    });
     it('should replace the string component with a string at the right location', () => {
       let content = "chris was here";
       let subject = "";
@@ -81,6 +103,47 @@ describe('JSONPlugin', () => {
       let result = p["applyTransform"](content, subject, travResult, fn, params);
       expect(result).to.equal("chris \"will be\" here");
     });
+    it('should call remove when type remove', () => {
+      let removeStub = sinon.stub(), getValStub = sinon.stub();
+      p["getTransformValue"] = getValStub;
+      p["transform_remove"] = removeStub;
+      let content = "one", subject = "two", travResult = { destination: { meta: { range: [6, 9] } } }, val = "three", params = new ParamsModel();
+      params.action = "remove";
+
+      p["applyTransform"](content, subject, travResult, val, params);
+
+      sinon.assert.calledWith(removeStub, content, travResult);
+    });
+  });
+
+  describe('#transform_remove', () => {
+    it('should remove an array element', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[1]");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 3] }');
+    });
+    it('should remove first array element', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[0]");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one": [2, 3] }');
+    });
+    it('should remove last array element', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[2]");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 2] }');
+    });
+  });
+
+  describe('#getTransformValue', () => {
     it('should call the replace function with the needed parameters', () => {
       let content = "chris was here";
       let subject = "";
@@ -91,9 +154,6 @@ describe('JSONPlugin', () => {
       let result = p["applyTransform"](content, subject, travResult, fn, params);
       expect(result).to.equal("chris \"would be\" here");
       sinon.assert.calledWith(fn, subject, travResult);
-    });
-    it('should use params.type when deciding how to insert', () => {
-
     });
   });
 });

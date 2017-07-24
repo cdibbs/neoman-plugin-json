@@ -17,4 +17,6 @@ export interface JisonMetaData {
     first_column: number;
     last_column: number;
     range: [number, number];
+    leftSep: JisonMetaData;
+    rightEl: JisonMetaData;
 }

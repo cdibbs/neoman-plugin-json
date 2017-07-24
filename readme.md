@@ -80,6 +80,12 @@ Boolean: true or false. Default: false.
 
 If the transform operation results in invalid JSON (according to ECMA-262 5th Edition, 15.12.1), the default action is to throw an error. You can override this behavior with `ignoreInvalid: true`, but be forewarned that any future JSON transforms over the same file will probably fail due to parsing errors.
 
+### Pre-launch To Do
+
+1. Add type field to transform elements (in addition to input section). Let users specify, e.g., that their "with" is JSON or a number.
+2. Add option to reserialize/normalize resulting JSON. Discards original formatting.
+3. Constructor and per-run params should be available in configurations section. Transform-specific params will override these.
+
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [LICENSE]: https://github.com/cdibbs/neoman-plugin-json/blob/master/LICENSE
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
