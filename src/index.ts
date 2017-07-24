@@ -49,17 +49,18 @@ class JSONPlugin {
         let val = this.getTransformValue(valOrFn, subject, travResult, params);
 
         if (params.action === Operations.set) {
-            let meta = travResult.destination.meta;
+            let dest = this.getRealDestination(travResult.destination);
+            let meta = dest.meta;
             let startIndex = meta.range[0];
             let endIndex = meta.range[1];
             //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
             return content.substr(0, startIndex) + val + content.substr(endIndex);
         } else if (params.action === Operations.setKey) {
-            if (travResult.destinationKey == null) {
+            if (travResult.destination.type !== "member") {
                 throw new Error(`Cannot set key. Destination "${travResult.subject}" is not a keyed object.`);
             }
 
-            let meta = travResult.destinationKey.meta;
+            let meta = travResult.destination.v[0].meta;
             let startIndex = meta.range[0];
             let endIndex = meta.range[1];
             //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
@@ -84,7 +85,9 @@ class JSONPlugin {
     protected transform_remove(content: string, travResult: TraversalResult): string {
         switch(travResult.parent.destination.type) {
             case "array":
+            case "member":
                 let meta = travResult.destination.meta;
+                console.log(travResult);
                 let startIndex, endIndex;
                 if (meta.leftSep) {
                     startIndex = meta.leftSep.range[0];
@@ -94,8 +97,9 @@ class JSONPlugin {
                     endIndex = meta.rightEl.range[0];
                 }
                 return content.substr(0, startIndex) + content.substr(endIndex);
+            case "object":
             default:
-            throw new Error("not implemented");
+                throw new Error(`Trying to remove from unknown parent type ${travResult.parent.destination.type}.`);
         }
     }
 
@@ -148,9 +152,14 @@ class JSONPlugin {
       let path = ast[1];
       for (var i=0; i<path.length; i++) {
         let key = path[i][1];
-        if (tr.destination.type === "object") {
+        let type = tr.destination.type;
+        if (type === "member") {
+            type = tr.destination.v[1].type;
+        }
+
+        if (type === "object") {
             tr = this.traverseObject(tr, key, path, i);
-        } else if (tr.destination.type === "array") {
+        } else if (type === "array") {
             tr = this.traverseArray(tr, key, path, i);
         } else {
             let err = `Element at subpath "${this.buildComponentStr(path, i)}" is not an array or object, but a "${tr.destination.type}".\n`;
@@ -161,12 +170,13 @@ class JSONPlugin {
     }
 
     protected traverseArray(tr: TraversalResult, key: any, path: string[], i: number): TraversalResult {
-        if (key >= 0 && key < (<Array<JSONPointer>>tr.destination.v).length) {
+        let dest: JSONPointer = this.getRealDestination(tr.destination);
+        if (key >= 0 && key < (<Array<JSONPointer>>dest.v).length) {
             let newTr = new TraversalResult();
             newTr.subject = this.buildComponentStr(path, i + 1);
             newTr.parent = tr;
-            newTr.destination = tr.destination.v[key];
-            newTr.destinationKey = null;
+            newTr.destination = dest.v[key];
+            //newTr.destinationKey = null;
             return newTr;
         } else {
             throw new Error(`Element "${key}" at subpath "${this.buildComponentStr(path, i)}" does not exist.`);
@@ -175,13 +185,15 @@ class JSONPlugin {
 
     protected traverseObject(tr: TraversalResult, key: any, path: string[], i: number): TraversalResult {
         let found = false;
-        for(var j=0; j<(<[JSONPointer]>tr.destination.v).length; j++) {
-            let tn = tr.destination.v[j]
+        let dest: JSONPointer = this.getRealDestination(tr.destination);
+        for(var j=0; j<(<[JSONPointer]>dest.v).length; j++) {
+            let tn = dest.v[j]
             if (tn.type === "member" && tn.v[0].v === key) {
                 let newTr = new TraversalResult();
                 newTr.subject = this.buildComponentStr(path, i + 1);
-                newTr.destination = tn.v[1];
-                newTr.destinationKey = tn.v[0];
+                newTr.destination = tn;
+                //newTr.destinationKey = tn.v[0];
+                //newTr
                 newTr.parent = tr;
                 found = true;
                 return newTr;
@@ -191,6 +203,14 @@ class JSONPlugin {
         if (! found) {
             throw new Error(`Element "${key}" at subpath "${this.buildComponentStr(path, i)}" does not exist.`);
         }
+    }
+
+    protected getRealDestination(dest: JSONPointer): JSONPointer {
+        if (dest.type === "member") {
+            return dest.v[1];
+        }
+
+        return dest;
     }
 
     protected buildComponentStr(path: any, upTo: number) {

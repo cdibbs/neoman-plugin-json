@@ -56,8 +56,8 @@ JSONMember: JSONString ":" JSONValue
 
 JSONMemberList: JSONMember
   { $$ = [ $1 ] }
-  | JSONMemberList "," JSONMember
-  { $1.push($3); $$ = $1; }
+  | JSONMemberList JSONSep JSONMember
+  { $3.meta.leftSep = $JSONSep; $1[$1.length - 1].meta.rightEl = $3.meta; $1.push($3); $$ = $1; }
   ;
 
 JSONArray: "[" "]"

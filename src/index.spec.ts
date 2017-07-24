@@ -25,7 +25,7 @@ describe('JSONPlugin', () => {
       expect(tr.destination).to.exist;
       expect(tr.destination.type).to.equal("string");
       expect(tr.parent).to.exist;
-      expect(tr.parent.destination.type).to.equal("array");
+      expect(tr.parent.destination.type).to.equal("member");
       expect(tr.destination.meta.first_column).to.equal(19);
       expect(tr.destination.meta.last_column).to.equal(24);
     });
@@ -37,7 +37,7 @@ describe('JSONPlugin', () => {
       expect(tr.destination).to.exist;
       expect(tr.destination.type).to.equal("object");
       expect(tr.parent).to.exist;
-      expect(tr.parent.destination.type).to.equal("array");
+      expect(tr.parent.destination.type).to.equal("member");
       tr = p["traverse"](pobj, "$.chris[1].two[1]");
       expect(tr).to.exist;
       expect(tr.destination).to.exist;
@@ -45,7 +45,7 @@ describe('JSONPlugin', () => {
       expect(tr.destination.orig).to.equal(3.141);
       expect(tr.destination.v).to.equal("3.141");
       expect(tr.parent).to.exist;
-      expect(tr.parent.destination.type).to.equal("array");      
+      expect(tr.parent.destination.type).to.equal("member");      
       expect(tr.destination.meta.first_column).to.equal(47);
       expect(tr.destination.meta.last_column).to.equal(52);
     });
@@ -140,6 +140,30 @@ describe('JSONPlugin', () => {
       let result = p["transform_remove"](content, travResult);
 
       expect(result).to.deep.equal('{ "one": [1, 2] }');
+    });
+    it('should remove an object member pair', () => {
+      let content = '{ "one":  { "a": "b", "c": "d", "e": "f" } }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one.c");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one":  { "a": "b", "e": "f" } }');
+    });
+    it('should remove first object member pair', () => {
+      let content = '{ "one":  { "a": "b", "c": "d", "e": "f" } }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one.a");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one":  { "c": "d", "e": "f" } }');
+    });
+    it('should remove last object member pair', () => {
+      let content = '{ "one":  { "a": "b", "c": "d", "e": "f" } }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one.e");
+      let result = p["transform_remove"](content, travResult);
+
+      expect(result).to.deep.equal('{ "one":  { "a": "b", "c": "d" } }');
     });
   });
 
