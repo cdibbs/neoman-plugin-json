@@ -114,6 +114,69 @@ describe('JSONPlugin', () => {
 
       sinon.assert.calledWith(removeStub, content, travResult);
     });
+    it('should call append when type append', () => {
+      let appendStub = sinon.stub(), getValStub = sinon.stub();
+      let replaceVal = { "weird": "thing" };
+      getValStub.returns(replaceVal)
+      p["getTransformValue"] = getValStub;
+      p["transform_append"] = appendStub;
+      let content = "one", subject = "two", travResult = { destination: { meta: { range: [6, 9] } } }, val = "three", params = new ParamsModel();
+      params.action = "append";
+
+      p["applyTransform"](content, subject, travResult, val, params);
+
+      sinon.assert.calledWith(appendStub, content, replaceVal, travResult);
+    });
+  });
+
+  describe('#transform_append', () => {
+    it('should append to a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_append"](content, "4", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 2, 3, 4] }');
+    });
+
+    it('should append to an empty array', () => {
+      let content = '{ "one": [] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_append"](content, "4", travResult);
+
+      expect(result).to.deep.equal('{ "one": [4] }');
+    });
+
+    it('should try to copy formatting', () => {
+      let content =
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    3\n\
+] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_append"](content, "4", travResult);
+
+      expect(result).to.deep.equal(
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    3,\n\
+    4\n\
+] }'
+      );
+    });
+
+    it('should append to an object', () => {
+      /*let content = '{ "one": "two" }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_append"](content, { "three": "four" }, travResult);
+
+      expect(result).to.deep.equal('{ "one": "two", "three": "four" }');*/
+    });
   });
 
   describe('#transform_remove', () => {

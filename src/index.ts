@@ -54,7 +54,7 @@ class JSONPlugin {
             let startIndex = meta.range[0];
             let endIndex = meta.range[1];
             //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
-            return content.substr(0, startIndex) + val + content.substr(endIndex);
+            return this.insertString(content, val, startIndex, endIndex);
         } else if (params.action === Operations.setKey) {
             if (travResult.destination.type !== "member") {
                 throw new Error(`Cannot set key. Destination "${travResult.subject}" is not a keyed object.`);
@@ -64,7 +64,7 @@ class JSONPlugin {
             let startIndex = meta.range[0];
             let endIndex = meta.range[1];
             //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
-            return content.substr(0, startIndex) + val + content.substr(endIndex);
+            return this.insertString(content, val, startIndex, endIndex);
         } else if (params.action === Operations.remove) {
             return this.transform_remove(content, travResult);
         } else if (params.action === Operations.append) {
@@ -72,7 +72,7 @@ class JSONPlugin {
             // Appending to an object requires an input type of object
             // Appending to a string requires a string
             // Appending to anything else throws
-            throw new Error("not implemented");
+            return this.transform_append(content, val, travResult);
         } else if (params.action === Operations.prepend) {
             throw new Error("not implemented");
         } else if (params.action === Operations.insertAfter) {
@@ -82,12 +82,45 @@ class JSONPlugin {
         }
     }
 
+    protected coerseString(val: any): string {
+        return val;
+    }
+
+    protected insertString(content: string, val: string, startIndex: number, endIndex: number): string {
+        return content.substr(0, startIndex) + val + content.substr(endIndex);
+    }
+
+    protected transform_append(content: string, val: string, travResult: TraversalResult): string {
+        let dest = this.getRealDestination(travResult.destination);
+        switch(dest.type) {
+            case "object":
+                throw new Error("not implemented");
+            case "array":
+                let startIndex: number, endIndex: number;
+                let arr = <Array<JSONPointer>>dest.v;
+                if (arr.length > 0) {
+                    let meta = dest.meta;
+                    let lastChild = arr[arr.length - 1];
+                    let filler = content.substr(lastChild.meta.leftSep.range[0], lastChild.meta.range[0] - lastChild.meta.leftSep.range[0]);
+                    endIndex = startIndex = lastChild.meta.range[1];
+                    return this.insertString(content, filler + val, startIndex, endIndex);
+                } else {
+                    let meta = dest.meta;
+                    startIndex = meta.range[0]+1;
+                    endIndex = meta.range[1]-1;
+                }
+                return this.insertString(content, val, startIndex, endIndex);
+            default:
+                console.log(JSON.stringify(dest, null, 2));
+                throw new Error("not implemented");
+        }
+    }
+
     protected transform_remove(content: string, travResult: TraversalResult): string {
         switch(travResult.parent.destination.type) {
             case "array":
-            case "member":
+            case "member": // object -> member -> (key: val)
                 let meta = travResult.destination.meta;
-                console.log(travResult);
                 let startIndex, endIndex;
                 if (meta.leftSep) {
                     startIndex = meta.leftSep.range[0];
@@ -103,7 +136,7 @@ class JSONPlugin {
         }
     }
 
-    protected getTransformValue(valOrFn: string | Function, subject: string, travResult: TraversalResult, params: ParamsModel): string {
+    protected getTransformValue(valOrFn: string | Function, subject: string, travResult: TraversalResult, params: ParamsModel): any {
         let r = valOrFn;
         if (typeof valOrFn === "function") {
             r = valOrFn(subject, travResult);
@@ -132,7 +165,7 @@ class JSONPlugin {
             throw new Error("unimplemented");
         }
 
-        return <string>r;
+        return r;
     }
 
     protected makeStringString(r: string): string {
