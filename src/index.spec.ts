@@ -73,6 +73,12 @@ describe('JSONPlugin', () => {
     });
   });
 
+  describe('#coerseString', () => {
+    it('should take a string, and return the same', () => {
+
+    });
+  });
+
   describe('#applyTransform', () => {
     it('should get transform value', () => {
       let stub = sinon.stub();
@@ -168,14 +174,46 @@ describe('JSONPlugin', () => {
 ] }'
       );
     });
+  });
 
-    it('should append to an object', () => {
-      /*let content = '{ "one": "two" }';
+  describe('#transform_prepend', () => {
+    it('should prepend to a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
       let metajson = JSONParser.parse(content);
       let travResult = p["traverse"](metajson, "$.one");
-      let result = p["transform_append"](content, { "three": "four" }, travResult);
+      let result = p["transform_prepend"](content, "0", travResult);
 
-      expect(result).to.deep.equal('{ "one": "two", "three": "four" }');*/
+      expect(result).to.deep.equal('{ "one": [0, 1, 2, 3] }');
+    });
+
+    it('should prepend to an empty array', () => {
+      let content = '{ "one": [] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_prepend"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [0] }');
+    });
+
+    it('should try to copy formatting', () => {
+      let content =
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    3\n\
+] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one");
+      let result = p["transform_prepend"](content, "0", travResult);
+
+      expect(result).to.deep.equal(
+'{ "one": [\n\
+    0,\n\
+    1,\n\
+    2,\n\
+    3\n\
+] }'
+      );
     });
   });
 

@@ -74,7 +74,7 @@ class JSONPlugin {
             // Appending to anything else throws
             return this.transform_append(content, val, travResult);
         } else if (params.action === Operations.prepend) {
-            throw new Error("not implemented");
+            return this.transform_prepend(content, val, travResult);
         } else if (params.action === Operations.insertAfter) {
             throw new Error("not implemented");
         } else if (params.action === Operations.insertBefore) {
@@ -103,7 +103,34 @@ class JSONPlugin {
                     let lastChild = arr[arr.length - 1];
                     let filler = content.substr(lastChild.meta.leftSep.range[0], lastChild.meta.range[0] - lastChild.meta.leftSep.range[0]);
                     endIndex = startIndex = lastChild.meta.range[1];
-                    return this.insertString(content, filler + val, startIndex, endIndex);
+                    return this.insertString(content, filler + this.coerseString(val), startIndex, endIndex);
+                } else {
+                    let meta = dest.meta;
+                    startIndex = meta.range[0]+1;
+                    endIndex = meta.range[1]-1;
+                }
+                return this.insertString(content, val, startIndex, endIndex);
+            default:
+                console.log(JSON.stringify(dest, null, 2));
+                throw new Error("not implemented");
+        }
+    }
+
+    protected transform_prepend(content: string, val: string, travResult: TraversalResult): string {
+        let dest = this.getRealDestination(travResult.destination);
+        switch(dest.type) {
+            case "object":
+                throw new Error("not implemented");
+            case "array":
+                let startIndex: number, endIndex: number;
+                let arr = <Array<JSONPointer>>dest.v;
+                if (arr.length > 0) {
+                    let meta = dest.meta;
+                    let firstChild = arr[0];
+                    let arrStart = dest.meta.range[1]+1;
+                    let filler = content.substr(firstChild.meta.range[1], firstChild.meta.rightEl.range[0] - firstChild.meta.range[1]);
+                    endIndex = startIndex = firstChild.meta.range[0];
+                    return this.insertString(content, this.coerseString(val) + filler, startIndex, endIndex);
                 } else {
                     let meta = dest.meta;
                     startIndex = meta.range[0]+1;
