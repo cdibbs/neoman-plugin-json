@@ -1,6 +1,6 @@
 import * as json from './parsers/json';
 import * as jsonPath from './parsers/json-path';
-import { TraversalResult, JSONPointer } from './traversal-result';
+import { TraversalResult, JSONPointer, JisonMetaData } from './traversal-result';
 import { ParamsModel, TransformAsTypes, Operations } from './types';
 
 class JSONPlugin {
@@ -76,9 +76,9 @@ class JSONPlugin {
         } else if (params.action === Operations.prepend) {
             return this.transform_prepend(content, val, travResult);
         } else if (params.action === Operations.insertAfter) {
-            throw new Error("not implemented");
+            return this.transform_insertBefore(content, val, travResult);
         } else if (params.action === Operations.insertBefore) {
-            throw new Error("not implemented");
+            return this.transform_insertAfter(content, val, travResult);
         }
     }
 
@@ -89,6 +89,67 @@ class JSONPlugin {
     protected insertString(content: string, val: string, startIndex: number, endIndex: number): string {
         return content.substr(0, startIndex) + val + content.substr(endIndex);
     }
+
+    protected transform_insertBefore(content: string, val: string, travResult: TraversalResult): string {
+        let dest = this.getRealDestination(travResult.destination);
+        let parentDest = this.getRealDestination(travResult.parent.destination);
+        //console.log(dest, travResult.parent, parentDest);
+        switch(parentDest.type) {
+            case "object":
+                throw new Error("not implemented");
+            case "array":
+                if (parentDest.v[0] === dest)
+                    return this.transform_prepend(content, val, travResult.parent);
+                
+                let postfill: string;
+                if (dest.meta.rightEl) {
+                    let after = dest.meta.range[1];
+                    let nextElBound = dest.meta.rightEl.range[0];
+                    postfill = content.substr(after, nextElBound - after);
+                } else {
+                    let after = dest.meta.leftSep.range[0];
+                    let curElBound = dest.meta.range[0];
+                    postfill = content.substr(after, curElBound - after);
+                }
+                let startIndex: number, endIndex: number;
+                endIndex = startIndex = dest.meta.range[0];
+                return this.insertString(content, this.coerseString(val) + postfill, startIndex, endIndex);
+            default:
+                console.log(JSON.stringify(dest, null, 2));
+                throw new Error(`not implemented for ${parentDest.type}`);
+        }
+    }
+
+    protected transform_insertAfter(content: string, val: string, travResult: TraversalResult): string {
+        let dest = this.getRealDestination(travResult.destination);
+        let parentDest = this.getRealDestination(travResult.parent.destination);
+        //console.log(dest, travResult.parent, parentDest);
+        switch(parentDest.type) {
+            case "object":
+                throw new Error("not implemented");
+            case "array":
+                if (parentDest.v[(<Array<JSONPointer>>parentDest.v).length - 1] === dest)
+                    return this.transform_append(content, val, travResult.parent);
+                
+                let prefill: string;
+                if (dest.meta.leftSep) {
+                    let firstBound = dest.meta.leftSep.range[0];
+                    let nextElBound = dest.meta.range[0];
+                    prefill = content.substr(firstBound, nextElBound - firstBound);
+                } else {
+                    let after = dest.meta.range[1];
+                    let curElBound = dest.meta.rightEl.range[0];
+                    prefill = content.substr(after, curElBound - after);
+                }
+                let startIndex: number, endIndex: number;
+                endIndex = startIndex = dest.meta.range[1];
+                return this.insertString(content, prefill + this.coerseString(val), startIndex, endIndex);
+            default:
+                console.log(JSON.stringify(dest, null, 2));
+                throw new Error(`not implemented for ${parentDest.type}`);
+        }
+    }
+
 
     protected transform_append(content: string, val: string, travResult: TraversalResult): string {
         let dest = this.getRealDestination(travResult.destination);
@@ -127,10 +188,37 @@ class JSONPlugin {
                 if (arr.length > 0) {
                     let meta = dest.meta;
                     let firstChild = arr[0];
-                    let arrStart = dest.meta.range[1]+1;
                     let filler = content.substr(firstChild.meta.range[1], firstChild.meta.rightEl.range[0] - firstChild.meta.range[1]);
                     endIndex = startIndex = firstChild.meta.range[0];
                     return this.insertString(content, this.coerseString(val) + filler, startIndex, endIndex);
+                } else {
+                    let meta = dest.meta;
+                    startIndex = meta.range[0]+1;
+                    endIndex = meta.range[1]-1;
+                }
+                return this.insertString(content, val, startIndex, endIndex);
+            default:
+                console.log(JSON.stringify(dest, null, 2));
+                throw new Error("not implemented");
+        }
+    }
+
+    // ?
+    protected transform_add(content: string, val: string, leftBound: JisonMetaData, rightBound: JisonMetaData, dest: JSONPointer): string {
+        //let dest = this.getRealDestination(travResult.destination);
+        switch(dest.type) {
+            case "object":
+                throw new Error("not implemented");
+            case "array":
+                let startIndex: number, endIndex: number;
+                let arr = <Array<JSONPointer>>dest.v;
+                if (arr.length > 0) {
+                    let meta = dest.meta;
+                    let firstChild = arr[0];
+                    let preFiller = content.substr(leftBound.range[0], dest.meta.range[0] - leftBound.range[0])
+                    let postFiller = content.substr(firstChild.meta.range[1], firstChild.meta.rightEl.range[0] - firstChild.meta.range[1]);
+                    endIndex = startIndex = firstChild.meta.range[0];
+                    return this.insertString(content, preFiller + this.coerseString(val) + postFiller, startIndex, endIndex);
                 } else {
                     let meta = dest.meta;
                     startIndex = meta.range[0]+1;

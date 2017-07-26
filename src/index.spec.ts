@@ -217,6 +217,124 @@ describe('JSONPlugin', () => {
     });
   });
 
+    describe('#transform_insertBefore', () => {
+    it('should insert before a middle element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[1]");
+      let result = p["transform_insertBefore"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 0, 2, 3] }');
+    });
+
+    it('should insert before the first element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[0]");
+      let result = p["transform_insertBefore"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [0, 1, 2, 3] }');
+    });
+
+    it('should insert before the last element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[2]");
+      let result = p["transform_insertBefore"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 2, 0, 3] }');
+    });
+
+    it('should throw on element does not exist', () => {
+      expect(() => {
+        let content = '{ "one": [] }';
+        let metajson = JSONParser.parse(content);
+        let travResult = p["traverse"](metajson, "$.one[0]");
+        let result = p["transform_insertBefore"](content, "0", travResult);
+      }).to.throw().and.property('message').to.contain('does not exist');
+    });
+
+    it('should try to copy formatting', () => {
+      let content =
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    3\n\
+] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[1]");
+      let result = p["transform_insertBefore"](content, "0", travResult);
+
+      expect(result).to.deep.equal(
+'{ "one": [\n\
+    1,\n\
+    0,\n\
+    2,\n\
+    3\n\
+] }'
+      );
+    });
+  });
+
+  describe('#transform_insertAfter', () => {
+    it('should insert after a middle element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[1]");
+      let result = p["transform_insertAfter"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 2, 0, 3] }');
+    });
+
+    it('should insert after the first element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[0]");
+      let result = p["transform_insertAfter"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 0, 2, 3] }');
+    });
+
+    it('should insert after the last element in a non-empty array', () => {
+      let content = '{ "one": [1, 2, 3] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[2]");
+      let result = p["transform_insertAfter"](content, "0", travResult);
+
+      expect(result).to.deep.equal('{ "one": [1, 2, 3, 0] }');
+    });
+
+    it('should throw on element does not exist', () => {
+      expect(() => {
+        let content = '{ "one": [] }';
+        let metajson = JSONParser.parse(content);
+        let travResult = p["traverse"](metajson, "$.one[0]");
+        let result = p["transform_insertAfter"](content, "0", travResult);
+      }).to.throw().and.property('message').to.contain('does not exist');
+    });
+
+    it('should try to copy formatting', () => {
+      let content =
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    3\n\
+] }';
+      let metajson = JSONParser.parse(content);
+      let travResult = p["traverse"](metajson, "$.one[1]");
+      let result = p["transform_insertAfter"](content, "0", travResult);
+
+      expect(result).to.deep.equal(
+'{ "one": [\n\
+    1,\n\
+    2,\n\
+    0,\n\
+    3\n\
+] }'
+      );
+    });
+  });
+
   describe('#transform_remove', () => {
     it('should remove an array element', () => {
       let content = '{ "one": [1, 2, 3] }';
