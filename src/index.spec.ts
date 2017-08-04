@@ -6,6 +6,7 @@ import * as chai from 'chai';
 let expect = chai.expect, assert = chai.assert;
 import * as sinon from 'sinon';
 import { ParamsModel } from './types';
+import { TraversalResult, JSONPointer } from './traversal-result';
 
 let JSONPlugin = require('./index');
 let JSONParser = require('./parsers/json');
@@ -14,6 +15,13 @@ describe('JSONPlugin', () => {
   let p: any;
   beforeEach(() => {
     p = new JSONPlugin();
+  });
+
+  describe('#configure', () => {
+    it('should setup plugin configuration', () => {
+      p.configure("something");
+      expect(p["pluginConfiguration"]).to.equal("something");
+    });
   });
 
   describe('#traverse', () => {
@@ -80,6 +88,20 @@ describe('JSONPlugin', () => {
   });
 
   describe('#applyTransform', () => {
+    let getTransformValueStub: sinon.SinonStub;
+    let testContent: string, testSubject: string;
+    let testVal: string | Function;
+    let testRetVal: string;
+    let testParams: ParamsModel;
+    let testTravResult: TraversalResult;
+    beforeEach(() => {
+      testContent = "test content", testSubject = "$.something", testVal = "test value", testParams = { };
+      testRetVal = "test return value";
+      testTravResult = { parent: null, subject: "bogus", destination: <JSONPointer>{ meta: { range: [0, 0] } } };
+      getTransformValueStub = sinon.stub();
+      getTransformValueStub.returns(testRetVal);
+      p["getTransformValue"] = getTransformValueStub;
+    });
     it('should get transform value', () => {
       let stub = sinon.stub();
       p["getTransformValue"] = stub;
@@ -91,23 +113,6 @@ describe('JSONPlugin', () => {
       p["applyTransform"](content, subject, travResult, "", params);
 
       sinon.assert.calledWith(stub, "", subject, travResult, params);
-    });
-    it('should replace the string component with a string at the right location', () => {
-      let content = "chris was here";
-      let subject = "";
-      let travResult = { destination: { meta: { range: [6, 9] } } };
-      let params = new ParamsModel();
-      let result = p["applyTransform"](content, subject, travResult, "is", params);
-      expect(result).to.equal("chris \"is\" here");
-    });
-    it('should replace the string component with a function result at the right location', () => {
-      let content = "chris was here";
-      let subject = "";
-      let travResult = { destination: { meta: { range: [6, 9] } } };
-      let fn = () => "will be";
-      let params = new ParamsModel();
-      let result = p["applyTransform"](content, subject, travResult, fn, params);
-      expect(result).to.equal("chris \"will be\" here");
     });
     it('should call remove when type remove', () => {
       let removeStub = sinon.stub(), getValStub = sinon.stub();
@@ -132,6 +137,25 @@ describe('JSONPlugin', () => {
       p["applyTransform"](content, subject, travResult, val, params);
 
       sinon.assert.calledWith(appendStub, content, replaceVal, travResult);
+    });
+
+    it('should call prepend when prepend', () => {
+      let stub = sinon.stub();
+      p["transform_prepend"] = stub;
+      testParams.action = "prepend";
+
+      p["applyTransform"](testContent, testSubject, testTravResult, testVal, testParams);
+
+      sinon.assert.calledWith(stub, testContent, testRetVal, testTravResult);
+    });
+  });
+
+  describe('#transform_set', () => {
+    it('should set the string at the right location', () => {
+      let content = "chris was here";
+      let travResult = { destination: { meta: { range: [6, 9] } } };
+      let result = p["transform_set"](content, "is", travResult);
+      expect(result).to.equal("chris is here");
     });
   });
 

@@ -16,6 +16,30 @@
   },
   "author": "Chris Dibbern <chris.dibbern@gmail.com> (https://github.com/cdibbs)",
   "license": "ISC",
+  "nyc": {
+    "include": [
+      "src/*.ts",
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "typings",
+      "src/e2e/resources",
+      "**/*.d.ts",
+      "**/*.spec.ts"
+    ],
+    "reporter": [
+      "json",
+      "html"
+    ],
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ],
+    "all": true
+  },
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/mocha": "^2.2.41",

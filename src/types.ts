@@ -3,9 +3,9 @@ export type UnionKeyToValue<U extends string> = {
 };
 
 export class ParamsModel {
-    action: Operation = Operations.set;
-    type: TransformAsType = TransformAsTypes.useSource;
-    ignoreInvalid: boolean = false;
+    action?: Operation = Operations.set;
+    type?: TransformAsType = TransformAsTypes.useSource;
+    ignoreInvalid?: boolean = false;
 }
 
 export type Operation = "set" | "setKey" | "append" | "prepend" | "insertAfter" | "insertBefore" | "remove";

@@ -11,26 +11,6 @@ class JSONPlugin {
     }
 
     transform(path: string, content: string, subject: string, valOrFn: string | Function, params: any): string {
-        /*let $ = c.load(content, this.pluginConfiguration);
-        let $r = $(replace);
-
-        if (typeof val === "string") {
-            switch (params.type) {
-                case "text": $r.text(val); break;
-                case "attr": $r.attr(params.attr, val); break;
-                case "addClass": $r.addClass(val); break;
-                case "prop": $r.prop(params.prop, val); break;
-                case "val": $r.val(val); break;
-                case "removeAttr": $r.removeAttr(params.val); break;
-                case "removeClass": $r.removeClass(params.val); break;
-                default:
-                    throw new Error(`Param type ${params.type} not understood.`);
-            }
-            return $.xml();
-        } else {
-            return val($r, path, content, replace, params);
-        }
-    */
         let obj: any;
 
         try {
@@ -49,22 +29,9 @@ class JSONPlugin {
         let val = this.getTransformValue(valOrFn, subject, travResult, params);
 
         if (params.action === Operations.set) {
-            let dest = this.getRealDestination(travResult.destination);
-            let meta = dest.meta;
-            let startIndex = meta.range[0];
-            let endIndex = meta.range[1];
-            //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
-            return this.insertString(content, val, startIndex, endIndex);
+            return this.transform_set(content, val, travResult);
         } else if (params.action === Operations.setKey) {
-            if (travResult.destination.type !== "member") {
-                throw new Error(`Cannot set key. Destination "${travResult.subject}" is not a keyed object.`);
-            }
-
-            let meta = travResult.destination.v[0].meta;
-            let startIndex = meta.range[0];
-            let endIndex = meta.range[1];
-            //console.log("range", meta, startIndex, endIndex, travResult.destination, travResult.parent)
-            return this.insertString(content, val, startIndex, endIndex);
+            return this.transform_setKey(content, val, travResult);
         } else if (params.action === Operations.remove) {
             return this.transform_remove(content, travResult);
         } else if (params.action === Operations.append) {
@@ -88,6 +55,25 @@ class JSONPlugin {
 
     protected insertString(content: string, val: string, startIndex: number, endIndex: number): string {
         return content.substr(0, startIndex) + val + content.substr(endIndex);
+    }
+
+    protected transform_set(content: string, val: string, travResult: TraversalResult): string {
+        let dest = this.getRealDestination(travResult.destination);
+        let meta = dest.meta;
+        let startIndex = meta.range[0];
+        let endIndex = meta.range[1];
+        return this.insertString(content, val, startIndex, endIndex);
+    }
+
+    protected transform_setKey(content: string, val: string, travResult: TraversalResult): string {
+        if (travResult.destination.type !== "member") {
+            throw new Error(`Cannot set key. Destination "${travResult.subject}" is not a keyed object.`);
+        }
+
+        let meta = travResult.destination.v[0].meta;
+        let startIndex = meta.range[0];
+        let endIndex = meta.range[1];
+        return this.insertString(content, val, startIndex, endIndex);
     }
 
     protected transform_insertBefore(content: string, val: string, travResult: TraversalResult): string {

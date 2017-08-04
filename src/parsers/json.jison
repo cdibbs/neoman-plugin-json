@@ -7,7 +7,6 @@
 %options ranges
 
 %%
-
 JSONString: STRING
   { $$ = { "type": "string", "orig": $1, "v": $1, "meta": @$ }; }
   ;

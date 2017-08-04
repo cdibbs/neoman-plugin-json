@@ -12,10 +12,12 @@ export class JSONPointer {
 }
 
 export interface JisonMetaData {
-    first_line: number;
+    // While Jison provides the following, they are not useful. Stick with range.
+    /*first_line: number;
     last_line: number;
     first_column: number;
-    last_column: number;
+    last_column: number; */
+    
     range: [number, number];
     leftSep: JisonMetaData;
     rightEl: JisonMetaData;
