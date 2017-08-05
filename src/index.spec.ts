@@ -148,6 +148,28 @@ describe('JSONPlugin', () => {
 
       sinon.assert.calledWith(stub, testContent, testRetVal, testTravResult);
     });
+
+    it('should call insertAfter when insertAfter', () => {
+      let stub = sinon.stub();
+      p["transform_insertAfter"] = stub;
+      testTravResult.parent = testTravResult; // only a dispatch test, doesn't matter
+      testParams.action = "insertAfter";
+
+      p["applyTransform"](testContent, testSubject, testTravResult, testVal, testParams);
+
+      sinon.assert.calledWith(stub, testContent, testRetVal, testTravResult);
+    });
+
+    it('should call insertBefore when insertBefore', () => {
+      let stub = sinon.stub();
+      p["transform_insertBefore"] = stub;
+      testTravResult.parent = testTravResult; // only a dispatch test, doesn't matter
+      testParams.action = "insertBefore";
+
+      p["applyTransform"](testContent, testSubject, testTravResult, testVal, testParams);
+
+      sinon.assert.calledWith(stub, testContent, testRetVal, testTravResult);
+    });
   });
 
   describe('#transform_set', () => {
