@@ -80,6 +80,13 @@ Boolean: true or false. Default: false.
 
 If the transform operation results in invalid JSON (according to ECMA-262 5th Edition, 15.12.1), the default action is to throw an error. You can override this behavior with `ignoreInvalid: true`, but be forewarned that any future JSON transforms over the same file will probably fail due to parsing errors.
 
+### Help Wanted
+
+1. Internationalization (i18n) support, languages
+2. Documentation. A short wiki might be nice. The readme should be relatively concise, with references to further info in the wiki.
+3. Fleshing out the plugin. There's lots of room, here. Enhance/extend JSONPath support. Add [JSON Patch](http://jsonpatch.com/)-style support. Etc.
+4. Clean-up, refactoring. Be brave but communicative (let us know when you'd like to begin, and about when you'd finish).
+
 ### Pre-launch To Do
 
 1. Add type field to transform elements (in addition to input section). Let users specify, e.g., that their "with" is JSON or a number.
