@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/cdibbs/neoman-plugin-json.svg?branch=master)](https://travis-ci.org/cdibbs/neoman-plugin-json)
-[![dependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json)
-[![devDependencies Status](https://david-dm.org/cdibbs/neoman-plugin-json/dev-status.svg)](https://david-dm.org/cdibbs/neoman-plugin-json?type=dev)
-[![codecov](https://codecov.io/gh/cdibbs/neoman-plugin-json/branch/master/graph/badge.svg)](https://codecov.io/gh/cdibbs/neoman-plugin-json)
+[![Build Status](https://travis-ci.org/yosplz/neoman-plugin-json.svg?branch=master)](https://travis-ci.org/yosplz/neoman-plugin-json)
+[![dependencies Status](https://david-dm.org/yosplz/neoman-plugin-json/status.svg)](https://david-dm.org/yosplz/neoman-plugin-json)
+[![devDependencies Status](https://david-dm.org/yosplz/neoman-plugin-json/dev-status.svg)](https://david-dm.org/yosplz/neoman-plugin-json?type=dev)
+[![codecov](https://codecov.io/gh/yosplz/neoman-plugin-json/branch/master/graph/badge.svg)](https://codecov.io/gh/yosplz/neoman-plugin-json)
 
 [![MIT License][license-badge]][LICENSE]
 [![PRs Welcome][prs-badge]][prs]
@@ -9,7 +9,7 @@
 
 # Neoman JSON Plugin
 
-This is the official JSON transform plugin for the [Neoman](https://github.com/cdibbs/neoman) templating engine. Use it to transform
+This is the official JSON transform plugin for the [Neoman](https://github.com/yosplz/neoman) templating engine. Use it to transform
 JSON files without modifying original whitespace and formatting.
 
 ## Basic Usage
@@ -87,8 +87,8 @@ If the transform operation results in invalid JSON (according to ECMA-262 5th Ed
 3. Constructor and per-run params should be available in configurations section. Transform-specific params will override these.
 
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[LICENSE]: https://github.com/cdibbs/neoman-plugin-json/blob/master/LICENSE
+[LICENSE]: https://github.com/yosplz/neoman-plugin-json/blob/master/LICENSE
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prs]: http://makeapullrequest.com
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square
-[coc]: https://github.com/cdibbs/neoman-plugin-json/blob/master/other/code_of_conduct.md
+[coc]: https://github.com/yosplz/neoman-plugin-json/blob/master/other/code_of_conduct.md
