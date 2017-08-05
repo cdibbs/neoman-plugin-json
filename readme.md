@@ -83,9 +83,13 @@ If the transform operation results in invalid JSON (according to ECMA-262 5th Ed
 ### Help Wanted
 
 1. Internationalization (i18n) support, languages
-2. Documentation. A short wiki might be nice. The readme should be relatively concise, with references to further info in the wiki.
-3. Fleshing out the plugin. There's lots of room, here. Enhance/extend JSONPath support. Add [JSON Patch](http://jsonpatch.com/)-style support. Etc.
-4. Clean-up, refactoring. Be brave but communicative (let us know when you'd like to begin, and about when you'd finish).
+2. Documentation. A short wiki might be nice. The readme should be relatively concise, with references to more info in the wiki.
+3. Fleshing out the plugin. There's lots of room, here.
+   1. Enhance/extend JSONPath support.
+   2. Add [JSON Patch](http://jsonpatch.com/)-style support.
+4. Clean-up, refactoring. Be brave but communicative (let us know when you'd like to begin, and about when you think you'd finish).
+5. SoC (seperation of concerns) - be of broader benefit to the community. Abstract this into a separate JSON-transform library,
+   and a Neoman support layer (this plugin), and
 
 ### Pre-launch To Do
 
