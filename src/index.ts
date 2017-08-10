@@ -212,7 +212,7 @@ class JSONPlugin {
     protected getTransformValue(valOrFn: string | Function, subject: string, travResult: TraversalResult, params: ParamsModel): any {
         let r = valOrFn;
         if (typeof valOrFn === "function") {
-            r = valOrFn(subject, travResult);
+            r = valOrFn(this.getRealDestination(travResult.destination).v);
         }
 
         if (params.type === TransformAsTypes.useSource) {
