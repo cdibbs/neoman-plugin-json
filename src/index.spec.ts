@@ -436,13 +436,14 @@ describe('JSONPlugin', () => {
     it('should call the replace function with the needed parameters', () => {
       let content = "chris was here";
       let subject = "";
-      let travResult = { destination: { meta: { range: [6, 9] } } };
+      let travResult = { destination: { v: "something", meta: { range: [6, 9] } } };
+      //p["getRealDestination"] = () => travResult;
       let fn = sinon.stub();
       fn.returns("would be");
       let params = new ParamsModel();
       let result = p["applyTransform"](content, subject, travResult, fn, params);
       expect(result).to.equal("chris \"would be\" here");
-      sinon.assert.calledWith(fn, subject, travResult);
+      sinon.assert.calledWith(fn, travResult.destination.v, travResult);
     });
   });
 });
